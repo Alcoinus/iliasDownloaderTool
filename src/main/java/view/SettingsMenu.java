@@ -23,11 +23,13 @@ import model.persistance.Settings;
 
 import org.controlsfx.control.PopOver;
 
-public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent> */{
+@SuppressWarnings("restriction")
+public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent> */ {
 	private static Button localIliasPath;
 	private final GridPane gridPane;
 	private Button autoUpdate;
 	private Button autoLogin;
+	private Button connectSecure;
 	private boolean promptUpdater;
 	private static FadeTransition t;
 	private static Dashboard dashboard;
@@ -40,15 +42,14 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		setDetachable(false);
 		hideOnEscapeProperty().set(true);
 		/*
-		 * @see
-		 * http://stackoverflow.com/questions/25336796/tooltip-background-with
+		 * @see http://stackoverflow.com/questions/25336796/tooltip-background-with
 		 * -javafx-css
 		 */
 		this.getScene().getRoot().getStyleClass().add("main-root");
 		/* ********************************************************** */
-		gridPane.setPadding(new Insets(50, 50, 50, 50));
-		gridPane.setHgap(20);
-		gridPane.setVgap(20);
+		gridPane.setPadding(new Insets(10, 10, 10, 10));
+		gridPane.setHgap(10);
+		gridPane.setVgap(10);
 		initDialog();
 		changeLocalIliasFolderButton();
 	}
@@ -63,12 +64,15 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 				hide();
 			}
 		});
+
 		gridPane.add(hideSettingsMenu, 0, 0);
 
-		Label selectIliasLocalBtn = new Label("Mein Lokaler Ilias Ordner            ");
-		gridPane.add(selectIliasLocalBtn, 0, 2);
+		Label selectIliasLocalBtn = new Label("Mein lokaler Ilias-Ordner");
+		gridPane.add(selectIliasLocalBtn, 0, 1);
 
 		localIliasPath = new Button();
+		localIliasPath.setPrefWidth(250);
+		localIliasPath.setMaxWidth(250);
 		localIliasPath.setOnAction(event -> {
 			showFileChooser();
 		});
@@ -81,8 +85,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 			helpText.getScene().getRoot().getStyleClass().add("main-root");
 			helpText.setDetachable(false);
 			Label text = new Label("Der lokale ILIAS-Ordner ist der Ordner, "
-					+ "in dem du auf deinem Computer deine Dateien"
-					+ " aus dem ILIAS speicherst.\nDiese Angabe wird "
+					+ "in dem du auf deinem Computer deine Dateien " + "aus dem ILIAS speicherst.\nDiese Angabe wird "
 					+ "ben\u00F6tigt, damit ein Abgleich stattfinden kann, "
 					+ "welche Dateien du bereits besitzt und welche noch nicht."
 					+ "\nDie Benennung deiner Unterordner oder Dateien spielt dabei keine Rolle.");
@@ -91,32 +94,34 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 			okBtn.setOnAction(event2 -> {
 				helpText.hide();
 			});
-			HBox box = new HBox();
-			box.getChildren().addAll(text, okBtn);
-			helpText.setContentNode(box);
+			HBox boxHelp = new HBox();
+			boxHelp.getChildren().addAll(text, okBtn);
+			helpText.setContentNode(boxHelp);
 			helpText.show(help);
 		});
 
-		HBox boxX = new HBox();
-		boxX.setSpacing(20);
-		boxX.getChildren().addAll(localIliasPath, help);
+		HBox boxPath = new HBox();
+		boxPath.setSpacing(10);
+		boxPath.getChildren().addAll(localIliasPath, help);
 
-		gridPane.add(boxX, 1, 2);
+		gridPane.add(boxPath, 1, 1);
 
-		Label startActions = new Label("Bei jedem Start ausführen          ");
-		autoLogin = new Button("Anmelden");
+		Label startActions = new Label("Bei jedem Start ausführen");
 		final EventHandler<ActionEvent> toggleButton = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				toggleButtonColor(event);
 			}
 		};
+		autoLogin = new Button("Anmelden");
+		autoLogin.setPrefWidth(120);
 		autoLogin.setOnAction(toggleButton);
 		autoUpdate = new Button("Aktualisieren");
+		autoUpdate.setPrefWidth(120);
 		autoUpdate.setOnAction(toggleButton);
-		HBox box = new HBox();
-		box.setSpacing(20);
-		box.getChildren().addAll(autoLogin, autoUpdate);
+		HBox boxAuto = new HBox();
+		boxAuto.setSpacing(10);
+		boxAuto.getChildren().addAll(autoLogin, autoUpdate);
 		Flags flags = Settings.getInstance().getFlags();
 		if (flags.isAutoLogin()) {
 			autoLogin.setId("autoButtonActive");
@@ -125,11 +130,12 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 			autoUpdate.setId("autoButtonActive");
 		}
 
-		gridPane.add(startActions, 0, 4);
-		gridPane.add(box, 1, 4);
+		gridPane.add(startActions, 0, 2);
+		gridPane.add(boxAuto, 1, 2);
 
-		Label contactDeveloper = new Label("Noch Fragen?         ");
+		Label contactDeveloper = new Label("Noch Fragen?");
 		Button emailAdress = new Button("Entwickler kontaktieren");
+		emailAdress.setPrefWidth(180);
 		emailAdress.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -138,6 +144,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 
 		});
 		Button faq = new Button("FAQ");
+		faq.setPrefWidth(60);
 		faq.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -145,11 +152,49 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 			}
 
 		});
-		HBox box2 = new HBox();
-		box2.setSpacing(20);
-		box2.getChildren().addAll(faq, emailAdress);
-		gridPane.add(contactDeveloper, 0, 5);
-		gridPane.add(box2, 1, 5);
+		HBox boxContact = new HBox();
+		boxContact.setSpacing(10);
+		boxContact.getChildren().addAll(faq, emailAdress);
+		gridPane.add(contactDeveloper, 0, 3);
+		gridPane.add(boxContact, 1, 3);
+
+		Label experimental = new Label("Experimentelle Einstellungen");
+		connectSecure = new Button("Sichere Verbindung benutzen");
+		connectSecure.setPrefWidth(250);
+		connectSecure.setOnAction(toggleButton);
+		if (flags.isConnectSecure()) {
+			connectSecure.setId("autoButtonActive");
+		}
+
+		Button helpSecure = new Button("?");
+		helpSecure.setId("greenButton");
+		helpSecure.setOnAction(event -> {
+			PopOver helpText = new PopOver();
+			helpText.setArrowSize(0);
+			helpText.getScene().getRoot().getStyleClass().add("main-root");
+			helpText.setDetachable(false);
+			Label text = new Label("Sollte dein IliasDownloader Probleme beim Login oder Aktualisieren "
+					+ "haben, ermöglicht dieser Button,\ndass die Sicherheit der Verbindung zu Ilias "
+					+ "weniger stark überprüft wird.\nDies sollte in den meisten Fällen das Problem "
+					+ "beheben.\nZwar wird dadurch die Verbindung nicht direkt unsicher,\ntrotzdem "
+					+ "sollte diese Funktion mit Vorsicht genossen werden.");
+			text.setPadding(new Insets(10, 10, 10, 10));
+			Button okBtn = new Button("X");
+			okBtn.setOnAction(event2 -> {
+				helpText.hide();
+			});
+			HBox boxSecure = new HBox();
+			boxSecure.getChildren().addAll(text, okBtn);
+			helpText.setContentNode(boxSecure);
+			helpText.show(helpSecure);
+		});
+
+		HBox boxExperimental = new HBox();
+		boxExperimental.setSpacing(10);
+		boxExperimental.getChildren().addAll(connectSecure, helpSecure);
+
+		gridPane.add(experimental, 0, 4);
+		gridPane.add(boxExperimental, 1, 4);
 	}
 
 	private void showFileChooser() {
@@ -159,8 +204,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Lokaler Ilias Ordner");
 
-		final String localIliasFolderPath = Settings.getInstance().getIliasFolderSettings()
-				.getLocalIliasFolderPath();
+		final String localIliasFolderPath = Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath();
 		if (!localIliasFolderPath.equals(".")) {
 			directoryChooser.setInitialDirectory(new File(localIliasFolderPath));
 		}
@@ -168,8 +212,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 		final File selectedFile = directoryChooser.showDialog(new Stage());
 
 		if (selectedFile != null) {
-			Settings.getInstance().getIliasFolderSettings()
-					.setLocalIliasFolderPath(selectedFile.getAbsolutePath());
+			Settings.getInstance().getIliasFolderSettings().setLocalIliasFolderPath(selectedFile.getAbsolutePath());
 			Settings.getInstance().getFlags().setLocalIliasPathStored(true);
 			localIliasPath.setText(selectedFile.getAbsolutePath());
 			updateLocalIliasFolderPath();
@@ -196,9 +239,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 
 	private void openEmailDialog() {
 		try {
-			Desktop.getDesktop()
-					.mail(new URI(
-							"mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
+			Desktop.getDesktop().mail(new URI("mailto:DeOldSax@gmx.de?subject=Bugreport/Verbesserungsvorschlag/Frage"));
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -206,8 +247,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 
 	private void openIliasWiki() {
 		try {
-			Desktop.getDesktop().browse(
-					new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
+			Desktop.getDesktop().browse(new URI("https://github.com/DeOldSax/iliasDownloaderTool/wiki"));
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -216,13 +256,11 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 	public void changeLocalIliasFolderButton() {
 		if (Settings.getInstance().getFlags().isLocalIliasPathStored()) {
 			localIliasPath.setId("localIliasPath");
-			localIliasPath.setText(Settings.getInstance().getIliasFolderSettings()
-					.getLocalIliasFolderPath());
+			localIliasPath.setText(Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath());
 			getBlinkyTransition().stop();
 			localIliasPath.setOpacity(1);
 		} else {
-			if (Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath()
-					.equals(".")) {
+			if (Settings.getInstance().getIliasFolderSettings().getLocalIliasFolderPath().equals(".")) {
 				localIliasPath.setText("Ilias Ordner auswählen");
 			}
 			localIliasPath.setId("localIliasPathNotSelected");
@@ -263,6 +301,15 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 				button.setId("autoButtonActive");
 			}
 			return;
+		}
+		if (button.equals(connectSecure)) {
+			if (flags.isConnectSecure()) {
+				flags.setConnectSecure(false);
+				button.setId(null);
+			} else {
+				flags.setConnectSecure(true);
+				button.setId("autoButtonActive");
+			}
 		}
 	}
 }

@@ -18,6 +18,7 @@ import utils.DirectoryUtils;
  * @author deoldsax
  *
  */
+@SuppressWarnings("restriction")
 public class IliasFolderDownloaderTask extends Task<Void> {
 	private List<IliasTreeNode> iliasTreeNodes;
 

@@ -25,6 +25,7 @@ import model.persistance.Settings;
 import control.LocalFileStorage;
 import download.IliasPdfDownloadCaller;
 
+@SuppressWarnings("restriction")
 public class ResultList extends ListView<IliasTreeNode> {
 	private final Dashboard dashboard;
 	private final GridPane headerPane;
@@ -65,8 +66,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 			public void handle(MouseEvent event) {
 				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2
 						&& Settings.getInstance().getFlags().isUserLoggedIn()) {
-					new Thread(new IliasPdfDownloadCaller(((ResultList) event.getSource())
-							.getSelectionModel().getSelectedItem())).start();
+					new Thread(new IliasPdfDownloadCaller(
+							((ResultList) event.getSource()).getSelectionModel().getSelectedItem())).start();
 				} else {
 					showContextMenu(event);
 				}
@@ -78,6 +79,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 				handleKeyEvents(event);
 			};
 		});
+
 	}
 
 	private void handleKeyEvents(KeyEvent event) {
@@ -88,19 +90,18 @@ public class ResultList extends ListView<IliasTreeNode> {
 			pdfIgnoredStateChanged(file);
 			getSelectionModel().selectNext();
 		} else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
-			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource())
-					.getSelectionModel().getSelectedItem();
+			final IliasTreeNode selectedDirectory = ((ResultList) event.getSource()).getSelectionModel()
+					.getSelectedItem();
 			dashboard.getCoursesTreeView().selectFile((IliasFile) selectedDirectory);
-		} else if (event.getCode() == KeyCode.ENTER
-				&& Settings.getInstance().getFlags().isUserLoggedIn()) {
+		} else if (event.getCode() == KeyCode.ENTER && Settings.getInstance().getFlags().isUserLoggedIn()) {
 			new Thread(new IliasPdfDownloadCaller(getSelectionModel().getSelectedItem())).start();
 		}
 	}
 
 	private void showContextMenu(MouseEvent event) {
 		menu.hide();
-		final List<IliasTreeNode> selectedNodes = ((ResultList) event.getSource())
-				.getSelectionModel().getSelectedItems();
+		final List<IliasTreeNode> selectedNodes = ((ResultList) event.getSource()).getSelectionModel()
+				.getSelectedItems();
 		if (selectedNodes.isEmpty() || selectedNodes == null) {
 			return;
 		}
@@ -158,8 +159,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 		for (IliasFile pdf : ignoredPdf) {
 			items.add(pdf);
 		}
-		dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.",
-				false);
+		Dashboard.setStatusText(ignoredPdf.size() + " ignorierte Dateien in Ignorieren-Liste.", false);
 		dashboard.setNumberofIngoredPdfs(ignoredPdf.size());
 	}
 
@@ -179,8 +179,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
 		final List<IliasFile> unsynchronizedFiles = new ArrayList<IliasFile>();
 
-		final Set<Integer> allLocalFileSizes = LocalFileStorage.getInstance()
-				.getAllLocalFileSizes();
+		final Set<Integer> allLocalFileSizes = LocalFileStorage.getInstance().getAllLocalFileSizes();
 		for (IliasFile file : allFiles) {
 			if (file.isIgnored()) {
 				continue;
@@ -189,8 +188,8 @@ public class ResultList extends ListView<IliasTreeNode> {
 				unsynchronizedFiles.add(file);
 			}
 		}
-		dashboard.setStatusText("Gesamt: " + allFiles.size() + ", davon sind "
-				+ unsynchronizedFiles.size() + " noch nicht im Ilias Ordner.", false);
+		Dashboard.setStatusText("Gesamt: " + allFiles.size() + ", davon sind " + unsynchronizedFiles.size()
+				+ " noch nicht im Ilias Ordner.", false);
 		setListHeader(" Lokal nicht vorhandene Dateien ", "");
 		dashboard.setNumberOfUnsynchronizedPdfs(unsynchronizedFiles.size());
 		items.clear();
@@ -228,7 +227,7 @@ public class ResultList extends ListView<IliasTreeNode> {
 		final List<IliasFile> allFiles = IliasTreeProvider.getAllIliasFiles();
 
 		if (allFiles.isEmpty()) {
-			dashboard.setStatusText("Keine passende Datei gefunden.", false);
+			Dashboard.setStatusText("Keine passende Datei gefunden.", false);
 			return;
 		}
 		dashboard.setStatusText("");
@@ -244,13 +243,11 @@ public class ResultList extends ListView<IliasTreeNode> {
 				splitedStrings[i] = (splitedStrings[i] + " ").toLowerCase();
 			}
 			for (int i = 0; i < splitedStrings.length; i++) {
-				if (splitedStrings[i].startsWith(inputString.toLowerCase())
-						&& !alreadyAddedFile.contains(file)) {
+				if (splitedStrings[i].startsWith(inputString.toLowerCase()) && !alreadyAddedFile.contains(file)) {
 					alreadyAddedFile.add(file);
 					continue;
 				}
-				if (inputString.contains(" ")
-						&& file.getName().toLowerCase().contains(inputString.toLowerCase())
+				if (inputString.contains(" ") && file.getName().toLowerCase().contains(inputString.toLowerCase())
 						&& !alreadyAddedFile.contains(file)) {
 					alreadyAddedFile.add(file);
 					continue;
@@ -262,26 +259,22 @@ public class ResultList extends ListView<IliasTreeNode> {
 				}
 				if (file.getParentFolder() != null) {
 					if (inputString.length() > 3
-							&& file.getParentFolder().getName().toLowerCase()
-									.contains(inputString.toLowerCase())
+							&& file.getParentFolder().getName().toLowerCase().contains(inputString.toLowerCase())
 							&& !alreadyAddedFile.contains(file)) {
 						alreadyAddedFile.add(file);
 					}
 					continue;
 				}
 				if (file.getParentFolder().getParentFolder() != null) {
-					if (inputString.length() > 3
-							&& file.getParentFolder().getParentFolder().getName().toLowerCase()
-									.contains(inputString.toLowerCase())
-							&& !alreadyAddedFile.contains(file)) {
+					if (inputString.length() > 3 && file.getParentFolder().getParentFolder().getName().toLowerCase()
+							.contains(inputString.toLowerCase()) && !alreadyAddedFile.contains(file)) {
 						alreadyAddedFile.add(file);
 					}
 					continue;
 				}
 			}
 		}
-		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedFile.size()) + ")",
-				"green");
+		setListHeader(" Gefundene Dateien " + "(" + String.valueOf(alreadyAddedFile.size()) + ")", "green");
 		if (alreadyAddedFile.isEmpty()) {
 			dashboard.setStatusText("Keine Datei gefunden.");
 		} else {

@@ -4,7 +4,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import plugin.IliasPlugin;
 import plugin.IliasPlugin.LoginStatus;
 import plugin.KITIlias;
-import plugin.TuebIlias;
 
 public class IliasManager {
 	private IliasPlugin ilias;
@@ -12,7 +11,6 @@ public class IliasManager {
 
 	private IliasManager() {
 		this.ilias = new KITIlias();
-//		this.ilias = new TuebIlias();
 	}
 
 	public static IliasManager getInstance() {

@@ -1,17 +1,24 @@
 package plugin;
 
-import java.io.*;
-import java.util.*;
-import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.message.*;
-import org.apache.http.protocol.*;
-import org.apache.http.util.*;
-import org.apache.log4j.*;
-import org.jsoup.*;
-import org.jsoup.nodes.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public class KITIlias extends IliasPlugin {
 
@@ -25,6 +32,7 @@ public class KITIlias extends IliasPlugin {
 
 	@Override
 	public LoginStatus login(String username, String password) {
+		newClient();
 		LoginStatus loginStatus = LoginStatus.CONNECTION_FAILED;
 		context = new BasicHttpContext();
 		nvps = new ArrayList<NameValuePair>();

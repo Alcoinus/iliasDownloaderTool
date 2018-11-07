@@ -1,9 +1,5 @@
 package view;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +24,6 @@ import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import model.IliasFile;
 import model.IliasFolder;
-import model.IliasForum;
 import model.IliasTreeNode;
 import model.persistance.IliasTreeProvider;
 import model.persistance.Settings;
@@ -36,6 +31,7 @@ import utils.DesktopHelper;
 import download.IliasFolderDownloaderTask;
 import download.IliasPdfDownloadCaller;
 
+@SuppressWarnings("restriction")
 public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	private final TreeItem<IliasTreeNode> rootItem;
 	private ContextMenu menu;
@@ -69,14 +65,10 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 					return;
 				}
 				if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-					if (selectedItem.getValue() instanceof IliasForum) {
-						openForum();
-						return;
-					} else if (selectedItem.getValue() instanceof IliasFile) {
+					if (selectedItem.getValue() instanceof IliasFile) {
 						if (Settings.getInstance().getFlags().isUserLoggedIn()) {
-							new Thread(new IliasPdfDownloadCaller(
-									((CoursesTreeView) event.getSource()).getSelectionModel()
-											.getSelectedItem().getValue())).start();
+							new Thread(new IliasPdfDownloadCaller(((CoursesTreeView) event.getSource())
+									.getSelectionModel().getSelectedItem().getValue())).start();
 						}
 					}
 				} else if (event.getButton() == MouseButton.SECONDARY) {
@@ -86,21 +78,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		});
 	}
 
-	private void openForum() {
-		final IliasForum forum = (IliasForum) this.getSelectionModel().getSelectedItem().getValue();
-		if (Desktop.isDesktopSupported()) {
-			try {
-				Desktop.getDesktop().browse(new URI(forum.getUrl()));
-			} catch (IOException | URISyntaxException e) {
-				e.printStackTrace();
-			}
-		} else {
-			dashboard.browse(forum.getUrl());
-		}
-	}
-
-	private void showContextMenu(ObservableList<TreeItem<IliasTreeNode>> selectedItems,
-			MouseEvent event) {
+	private void showContextMenu(ObservableList<TreeItem<IliasTreeNode>> selectedItems, MouseEvent event) {
 		menu.getItems().clear();
 
 		List<IliasTreeNode> selectedIliasTreeNodes = new ArrayList<IliasTreeNode>();
@@ -127,8 +105,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 				setCourses(item, folder.getChildNodes());
 				item.setGraphic(node.getGraphic());
 			} else if (node instanceof IliasFile) {
-				item.setGraphic(node.getGraphic());
-			} else if (node instanceof IliasForum) {
 				item.setGraphic(node.getGraphic());
 			}
 		}
@@ -194,8 +170,7 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 	}
 
 	/**
-	 * This class draws the ListCells.
-	 * http://stackoverflow.com/questions/23137131
+	 * This class draws the ListCells. http://stackoverflow.com/questions/23137131
 	 * /javafx-listview-with-button-in-each-cell
 	 * 
 	 * @author deoldsax
@@ -211,20 +186,9 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		private Button openerButton;
 		private Button printerButton;
 		private HBox actions;
-		
+
 		public IliasTreeCell() {
 			pane = buildCell();
-			EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent arg0) {
-					if (node != null) {
-						// redraw();
-						update();
-					}
-				}
-			};
-			// setOnMouseEntered(mouseHandler);
-			// setOnMouseExited(mouseHandler);
 		}
 
 		@Override
@@ -244,6 +208,9 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 
 		private BorderPane buildCell() {
 			final BorderPane pane = new BorderPane();
+
+			pane.setPrefWidth(this.getWidth());
+
 			box = new Label();
 			box.setAlignment(Pos.TOP_LEFT);
 
@@ -262,16 +229,13 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			} else if (node instanceof IliasFile) {
 				IliasFile file = (IliasFile) node;
 				box.setGraphic(file.getGraphic());
-			} else if (node instanceof IliasForum) {
-				box.setGraphic(new ImageView("img/forum.png"));
 			}
 
 			box.setText(node.toString());
 
 			actions.getChildren().clear();
-			if (!(node instanceof IliasForum)) {
-				actions.getChildren().add(downloadButton);
-			}
+			actions.getChildren().add(downloadButton);
+
 			if (node instanceof IliasFile) {
 				if (((IliasFile) node).isIgnored()) {
 					ignoreButton.setGraphic(new ImageView("img/check.png"));
@@ -291,33 +255,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			openerButton.mouseTransparentProperty().bind(hoverProperty().not());
 			printerButton.visibleProperty().bind(hoverProperty());
 			printerButton.mouseTransparentProperty().bind(hoverProperty().not());
-		}
-
-		private void redraw() {
-			if (node == null) {
-				setGraphic(null);
-				return;
-			}
-
-			final BorderPane pane = new BorderPane();
-			final Label box = new Label();
-			box.setAlignment(Pos.TOP_LEFT);
-
-			if (node instanceof IliasFolder) {
-				IliasFolder folder = (IliasFolder) node;
-				box.setGraphic(folder.getGraphic());
-			} else if (node instanceof IliasFile) {
-				IliasFile file = (IliasFile) node;
-				box.setGraphic(file.getGraphic());
-			} else if (node instanceof IliasForum) {
-				box.setGraphic(new ImageView("img/forum.png"));
-			}
-
-			box.setText(node.toString());
-			pane.setLeft(box);
-			createAndAddActions(pane);
-			setGraphic(pane);
-			createToolTip();
 		}
 
 		private void createToolTip() {
@@ -367,9 +304,8 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 			actions.setId("actionBar");
 			actions.setSpacing(10);
 
-			if (!(node instanceof IliasForum)) {
-				actions.getChildren().add(downloadButton);
-			}
+			actions.getChildren().add(downloadButton);
+
 			if (node instanceof IliasFile) {
 				if (((IliasFile) node).isIgnored()) {
 					ignoreButton.setGraphic(new ImageView("img/check.png"));

@@ -24,12 +24,12 @@ import org.controlsfx.control.textfield.*;
 
 import control.*;
 
+@SuppressWarnings("restriction")
 public class Dashboard extends Application {
 
 	private Dashboard dashboard;
 	private Stage stage;
 	private Scene scene;
-	private LoginFader loginFader;
 	private SplitPane splitPane;
 	private StackPane stackPane;
 	private GridPane actualisationTimePane;
@@ -43,12 +43,12 @@ public class Dashboard extends Application {
 	private static CoursesTreeView courses;
 	private Button signIn;
 	private GridPane actionBar;
-	private LoginFader loginFader2;
 	private boolean loaderRunning;
 	private CustomTextField searchField;
 	private Button showLocalNotThere;
 	private Button showIgnored;
 	private RotateTransition refreshTransition;
+	private LoginPopup loginPopup;
 
 	static {
 		Security.insertProviderAt(new BouncyCastleProvider(), 1);
@@ -58,11 +58,6 @@ public class Dashboard extends Application {
 		new File(System.getProperty("user.home") + "/.ilias/ilias.log").delete();
 		PropertyConfigurator.configure(Dashboard.class.getResourceAsStream("log4j.properties"));
 		Logger.getLogger(Dashboard.class).warn("Start IliasDownloaderTool.");
-
-		boolean newVersionCalled = new VersionValidator().validate();
-		if (newVersionCalled) {
-			System.exit(0);
-		}
 
 		launch();
 	}
@@ -83,45 +78,9 @@ public class Dashboard extends Application {
 		});
 		this.stage = stage;
 		background = new BorderPane();
-		background.setPadding(new Insets(20, 50, 20, 50));
+		background.setPadding(new Insets(10, 10, 10, 10));
 
 		actionBar = new GridPane();
-
-		final GridPane login = new GridPane();
-		login.setId("loginBackground");
-		login.setHgap(10);
-		login.setVgap(5);
-
-		Button goBack = new Button();
-		goBack.setId("loginButtonCancel");
-		loginFader2 = new LoginFader(this, -500, login);
-		goBack.setOnAction(loginFader2);
-		TextField username = new TextField();
-		username.setId("textField");
-		username.setPromptText("Benutzererkennung");
-		username.setText(Settings.getInstance().getUser().getName());
-		PasswordField password = new PasswordField();
-		password.setText(Settings.getInstance().getUser().getPassword());
-		password.setId("textField");
-		password.setPromptText("Passwort");
-		RadioButton savePwd = new RadioButton("Speichern");
-		savePwd.setSelected(true);
-		Button loginBtn = new Button();
-		loginFader = new LoginFader(this, -500, login);
-		loginBtn.setId("loginButtonGO");
-		loginFader.getT().setOnFinished(new LoginProvider(this, username, password, savePwd));
-		loginBtn.setOnAction(loginFader);
-		username.setOnAction(loginFader);
-		password.setOnAction(loginFader);
-		Separator separator = new Separator(Orientation.VERTICAL);
-
-		login.add(goBack, 0, 0);
-		login.add(username, 1, 0);
-		login.add(password, 2, 0);
-		login.add(loginBtn, 3, 0);
-		login.add(savePwd, 1, 1);
-		login.add(separator, 4, 0);
-		login.setOpacity(0);
 
 		courses = new CoursesTreeView(this);
 		resultList = new ResultList(this);
@@ -137,7 +96,6 @@ public class Dashboard extends Application {
 
 		stackPane = new StackPane();
 		stackPane.getChildren().add(actualisationTimePane);
-		stackPane.getChildren().add(login);
 		stackPane.getChildren().add(actionBar);
 
 		actionBar.prefWidthProperty().bind(background.widthProperty());
@@ -154,6 +112,7 @@ public class Dashboard extends Application {
 		});
 		collapseTree.setTooltip(new Tooltip("Alle Ordner schließen"));
 		collapseTree.prefWidthProperty().bind(actionBar.prefWidthProperty());
+		
 		refreshButton = new Button();
 
 		refreshTransition = new RotateTransition(Duration.millis(1000), refreshButton);
@@ -179,17 +138,22 @@ public class Dashboard extends Application {
 								return null;
 							}
 						}).start();
-						// LocalFileStorage.getInstance().refresh();
 					}
 				}
 			}
 		});
+
+		loginPopup = new LoginPopup(dashboard);
+
 		signIn = new Button("Anmelden");
 		signIn.setId("loginButton");
-		signIn.setOnAction(new LoginFader(this, 500, login));
+		signIn.setOnAction(event -> {
+			loginPopup.show(signIn);
+		});
 		signIn.prefWidthProperty().bind(actionBar.prefWidthProperty());
-		showLocalNotThere = new Button("Lokal nicht vorhandene Dateien " + "("
-				+ resultList.getUnsynchronizedPdfs().size() + ")");
+		
+		showLocalNotThere = new Button(
+				"Lokal nicht vorhandene Dateien " + "(" + resultList.getUnsynchronizedPdfs().size() + ")");
 		showLocalNotThere.getStyleClass().add("actionButton");
 		showLocalNotThere.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		showLocalNotThere.setOnAction(new EventHandler<ActionEvent>() {
@@ -198,8 +162,8 @@ public class Dashboard extends Application {
 				resultList.showUnsynchronizedPdfs();
 			}
 		});
-		showIgnored = new Button("Ignorierte Dateien " + "("
-				+ resultList.getIgnoredIliasPdfs().size() + ")");
+		
+		showIgnored = new Button("Ignorierte Dateien " + "(" + resultList.getIgnoredIliasPdfs().size() + ")");
 		showIgnored.getStyleClass().add("actionButton");
 		showIgnored.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -209,6 +173,7 @@ public class Dashboard extends Application {
 		});
 		showIgnored.prefWidthProperty().bind(actionBar.prefWidthProperty());
 		showIgnored.setMaxWidth(Double.MAX_VALUE);
+		
 		searchField = new CustomTextField();
 		ImageView loupe = new ImageView();
 		loupe.setId("loupe");
@@ -234,10 +199,10 @@ public class Dashboard extends Application {
 			}
 		});
 		searchField.prefWidthProperty().bind(actionBar.prefWidthProperty());
+		
 		settingsButton = new Button();
 		settingsButton.setId("settingsButton");
 		settingsButton.getStyleClass().add("doButton");
-
 		settingsButton.setOnAction(event -> {
 			SettingsMenu menu = new SettingsMenu(dashboard);
 			menu.show(settingsButton);
@@ -285,7 +250,7 @@ public class Dashboard extends Application {
 		statusFooter.add(statusFooterText, 0, 0);
 
 		GridPane footer = new GridPane();
-		footer.setVgap(20);
+		footer.setVgap(10);
 		footer.add(statusFooter, 0, 0);
 		background.setBottom(footer);
 
@@ -309,8 +274,8 @@ public class Dashboard extends Application {
 					User user = newSettings.getUser();
 					String name = user.getName();
 					String password = user.getPassword();
-					final IliasStarter iliasStarter = new IliasStarter(dashboard, name, password);
-					final boolean loginSuccessfull = iliasStarter.login();
+					final IliasStarter iliasStarter = new IliasStarter(dashboard);
+					final boolean loginSuccessfull = iliasStarter.login(name, password);
 					if (loginSuccessfull && newSettings.getFlags().autoUpdate()) {
 						Platform.runLater(new Runnable() {
 							@Override
@@ -347,8 +312,25 @@ public class Dashboard extends Application {
 		lastUpdateTime.setText(IliasTreeStorage.getUpdateTime());
 	}
 
-	public void fadeInLogin() {
-		loginFader2.fadeIn();
+	public void showLoginPopup() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				signIn.setMouseTransparent(true);
+			}
+		});
+		loginPopup.show(signIn);
+	}
+
+	public void hideLoginPopup() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				signIn.setMouseTransparent(false);
+			}
+		});
+		loginPopup.hide();
+		;
 	}
 
 	public void setMenuTransparent(final boolean b) {
@@ -369,6 +351,14 @@ public class Dashboard extends Application {
 		});
 	}
 
+	public void setLoginState(final boolean b) {
+		if (b) {
+			signIn.setText("Angemeldet");
+		} else {
+			signIn.setText("Anmelden");
+		}
+	}
+
 	public void showLoader(final boolean show) {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -382,8 +372,6 @@ public class Dashboard extends Application {
 					setLoaderButtonActivated(false);
 					loaderRunning = false;
 					refreshButton.setMouseTransparent(false);
-					signIn.setText("Angemeldet");
-					signIn.setOpacity(1);
 				}
 			}
 		});
@@ -398,8 +386,7 @@ public class Dashboard extends Application {
 	}
 
 	public static void setStatusText(final String text, boolean alert) {
-		final TranslateTransition t = new TranslateTransition(Duration.millis(600),
-				statusFooterText);
+		final TranslateTransition t = new TranslateTransition(Duration.millis(600), statusFooterText);
 		t.setInterpolator(Interpolator.EASE_BOTH);
 		t.setFromX(statusFooterText.getLayoutX() - 500);
 		t.setToX(statusFooterText.getLayoutX());
@@ -487,8 +474,7 @@ public class Dashboard extends Application {
 	}
 
 	public void setNumberOfUnsynchronizedPdfs(int number) {
-		showLocalNotThere.setText("Lokal nicht vorhandene Dateien " + "(" + String.valueOf(number)
-				+ ")");
+		showLocalNotThere.setText("Lokal nicht vorhandene Dateien " + "(" + String.valueOf(number) + ")");
 	}
 
 	public void setNumberofIngoredPdfs(int number) {

@@ -1,19 +1,25 @@
 package download;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-import javafx.application.*;
-import javafx.concurrent.*;
-import model.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.log4j.Logger;
 
-import org.apache.http.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.protocol.*;
-import org.apache.log4j.*;
+import control.IliasManager;
+import control.LocalFileStorage;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import model.IliasFile;
+import view.Dashboard;
 
-import view.*;
-import control.*;
-
+@SuppressWarnings("restriction")
 public class IliasFileDownloaderTask extends Task<Void> {
 	private HttpGet request;
 	private HttpResponse response;

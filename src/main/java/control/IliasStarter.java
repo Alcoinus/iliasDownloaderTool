@@ -1,17 +1,16 @@
 package control;
 
-import javafx.application.*;
-import model.persistance.*;
+import org.apache.log4j.Logger;
 
-import org.apache.log4j.*;
-
+import javafx.application.Platform;
+import model.persistance.Flags;
+import model.persistance.IliasTreeProvider;
+import model.persistance.Settings;
 import plugin.IliasPlugin.LoginStatus;
-import plugin.*;
-import view.*;
+import view.Dashboard;
 
+@SuppressWarnings("restriction")
 public class IliasStarter {
-	private String username = null;
-	private String password = null;
 	private Logger LOGGER = Logger.getLogger(getClass());
 	private Dashboard dashboard;
 
@@ -19,52 +18,55 @@ public class IliasStarter {
 		this.dashboard = dashboard;
 	}
 
-	public IliasStarter(Dashboard dashboard, String username, String password) {
-		this.dashboard = dashboard;
-		this.username = username;
-		this.password = password;
-	}
-
-	public boolean login() {
+	public boolean login(String username, String password) {
 		LoginStatus loginStatusMessage = IliasManager.getInstance().login(username, password);
+
 		if (loginStatusMessage.equals(LoginStatus.WRONG_PASSWORD)) {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
 					dashboard.showLoader(false);
-					dashboard.setSigInTransparent(true);
-					dashboard.fadeInLogin();
-					dashboard.setStatusText("Falsches Passwort!", true);
+					dashboard.setLoginState(false);
+					dashboard.showLoginPopup();
+					Dashboard.setStatusText("Falsches Passwort!", true);
 				}
 			});
 			return false;
 		}
 		if (loginStatusMessage.equals(LoginStatus.CONNECTION_FAILED)) {
 			LOGGER.warn("Connection failed!");
-			dashboard.setStatusText("Verbindung fehlgeschlagen!", true);
-			dashboard.showLoader(false);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					dashboard.showLoader(false);
+					dashboard.setLoginState(false);
+					dashboard.setSigInTransparent(false);
+					Dashboard.setStatusText("Verbindung fehlgeschlagen!", true);
+				}
+			});
 			return false;
 		}
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				dashboard.setTitle("Ilias - Angemeldet als " + username);
-				dashboard.setStatusText("Angemeldet als: " + username, false);
+				Dashboard.setStatusText("Angemeldet als: " + username, false);
 			}
 		});
+
 		Settings.getInstance().getFlags().setLogin(true);
+
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				dashboard.showLoader(false);
+				dashboard.setLoginState(true);
+				dashboard.setSigInTransparent(true);
 				dashboard.setSignInColor();
 				if (!Settings.getInstance().getFlags().autoUpdate()) {
-					dashboard
-							.setStatusText(
-									"Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!",
-									false);
+					Dashboard.setStatusText(
+							"Aktualisiere über den Button in der Menüleiste die Kurse auf deinem Schreibtisch!", false);
 				}
-				dashboard.setSigInTransparent(true);
 			}
 		});
 		return true;
@@ -86,7 +88,7 @@ public class IliasStarter {
 			flags.setUpdateCanceled(false);
 		} else {
 			flags.setUpdateCanceled(false);
-			dashboard.setStatusText("Aktualisierung abgebrochen.", false);
+			Dashboard.setStatusText("Aktualisierung abgebrochen.", false);
 			return;
 		}
 

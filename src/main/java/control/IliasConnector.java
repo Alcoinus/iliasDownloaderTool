@@ -24,11 +24,12 @@ public class IliasConnector {
 		try {
 			request = new HttpGet(url);
 
-			final HttpClient client = IliasManager.getInstance().getIliasClient();
-			response = client.execute(request, context);
+			response = IliasManager.getInstance().getIliasClient().execute(request, context);
+
 			entity = response.getEntity();
 
 			html = EntityUtils.toString(entity);
+
 			request.releaseConnection();
 
 		} catch (Exception e) {

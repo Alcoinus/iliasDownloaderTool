@@ -1,15 +1,16 @@
 package model;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javafx.scene.image.*;
-import model.persistance.*;
+import org.apache.log4j.Logger;
 
-import org.apache.log4j.*;
+import control.LocalFileStorage;
+import javafx.scene.image.ImageView;
+import model.persistance.Settings;
+import utils.FileAppearanceManager;
 
-import utils.*;
-import control.*;
-
+@SuppressWarnings("restriction")
 public class IliasFile extends IliasTreeNode {
 
 	private static final long serialVersionUID = -6286982393008142116L;

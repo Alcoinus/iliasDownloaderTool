@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("restriction")
 public class FileAppearanceManager {
 	
 	private static FileAppearanceManager instance; 

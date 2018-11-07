@@ -1,11 +1,14 @@
 package control;
 
-import java.io.*;
-import org.apache.http.*;
-import org.apache.http.client.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.cookie.*;
-import org.apache.http.protocol.*;
+import java.io.IOException;
+
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.protocol.BasicHttpContext;
 
 public class IliasSessionUtils {
 	public void printCookies(CookieStore cookieStore) {

@@ -11,13 +11,7 @@ public class DirectoryUtils {
 	private String[] oddCharsReplacements = { " - ", "-", "+", "_", "[", "]", "--", "", "-" };
 
 	public String makeDirectoryNameValid(String directoryname) {
-		// if (System.getProperty("os.name").toLowerCase().contains("windows"))
-		// {
 		return createValidWinDir(directoryname);
-		// } else {
-		//
-		// }
-		// TODO valid unix basid dir?
 	}
 
 	private String createValidWinDir(String directoryname) {

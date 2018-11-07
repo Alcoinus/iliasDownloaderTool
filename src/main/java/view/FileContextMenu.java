@@ -1,9 +1,5 @@
 package view;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import javafx.event.ActionEvent;
@@ -14,7 +10,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import model.IliasFile;
 import model.IliasFolder;
-import model.IliasForum;
 import model.IliasTreeNode;
 import model.persistance.Settings;
 import utils.DesktopHelper;
@@ -23,6 +18,7 @@ import download.DownloadMode;
 import download.IliasFolderDownloaderTask;
 import download.IliasPdfDownloadCaller;
 
+@SuppressWarnings("restriction")
 public class FileContextMenu {
 
 	private final ContextMenu menu;
@@ -36,14 +32,10 @@ public class FileContextMenu {
 	private final MenuItem printItem;
 	private final MenuItem openParentFolderItem;
 	private final MenuItem openFileItem;
-	private final MenuItem openForumItem;
 	private IliasTreeNode selectedIliasTreeNode;
 	private List<IliasTreeNode> selectedIliasTreeNodes;
-	private final Dashboard dashboard;
 
 	public FileContextMenu(final Dashboard dashboard) {
-		this.dashboard = dashboard;
-		// FIXME add param Dashboard
 		menu = new ContextMenu();
 		menu.getScene().getRoot().getStyleClass().add("main-root");
 		downloadIliasFileItem = new MenuItem("Herunterladen");
@@ -123,13 +115,6 @@ public class FileContextMenu {
 				DesktopHelper.openFile((IliasFile) selectedIliasTreeNode);
 			}
 		});
-		openForumItem = new MenuItem("Im Browser öffnen");
-		openForumItem.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				openForum();
-			}
-		});
 	}
 
 	public ContextMenu createMenu(List<IliasTreeNode> selectedNodes, MouseEvent event) {
@@ -150,9 +135,6 @@ public class FileContextMenu {
 					menu.getItems().add(downloadIliasFoldersItem);
 					selectedNodesContainsFolder = true;
 				}
-				if (iliasTreeNode instanceof IliasForum) {
-					selectedNodes.remove(iliasTreeNode);
-				}
 			}
 			selectedIliasTreeNodes = selectedNodes;
 		}
@@ -165,9 +147,6 @@ public class FileContextMenu {
 
 		if (node instanceof IliasFolder && Settings.getInstance().getFlags().isUserLoggedIn()) {
 			menu.getItems().add(0, downloadIliasFolderItem);
-		} else if (node instanceof IliasForum) {
-			menu.getItems().add(openForumItem);
-			return menu;
 		} else if (node instanceof IliasFile) {
 			IliasFile file = (IliasFile) node;
 			if (file.isIgnored()) {
@@ -205,16 +184,4 @@ public class FileContextMenu {
 		new Thread(new IliasFolderDownloaderTask(selectedIliasFolders)).start();
 	}
 
-	private void openForum() {
-		final IliasForum forum = (IliasForum) this.selectedIliasTreeNode;
-		if (Desktop.isDesktopSupported()) {
-			try {
-				Desktop.getDesktop().browse(new URI(forum.getUrl()));
-			} catch (IOException | URISyntaxException e) {
-				e.printStackTrace();
-			}
-		} else {
-			dashboard.browse(forum.getUrl());
-		}
-	}
 }

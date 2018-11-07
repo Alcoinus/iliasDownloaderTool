@@ -9,34 +9,41 @@ import javafx.scene.control.TextField;
 import model.persistance.Settings;
 import model.persistance.User;
 import view.Dashboard;
+import view.LoginPopup;
 
+@SuppressWarnings("restriction")
 public class LoginProvider implements EventHandler<ActionEvent> {
 
 	private final TextField usernameField;
 	private final PasswordField passwordField;
 	private final RadioButton savePwd;
 	private final Dashboard dashboard;
+	private final LoginPopup login;
+	private final IliasStarter starter;
 
 	public LoginProvider(Dashboard dashboard, TextField usernameField, PasswordField passwordField,
-			RadioButton savePwd) {
+			RadioButton savePwd, LoginPopup login) {
 		this.dashboard = dashboard;
 		this.usernameField = usernameField;
 		this.passwordField = passwordField;
 		this.savePwd = savePwd;
+		this.login = login;
+		starter = new IliasStarter(dashboard);
 	}
 
 	@Override
 	public void handle(ActionEvent event) {
-		dashboard.setStatusText("", false);
-		dashboard.showLoader(true);
-		dashboard.setMenuTransparent(false);
-		dashboard.setSigInTransparent(true);
 		final String username = usernameField.getText();
 		final String password = passwordField.getText();
 		if (password.length() < 1) {
 			toggleDashboardLoginState("Ungültiges Passwort");
 			return;
 		}
+		
+		login.hide();
+		Dashboard.setStatusText("Login wird durchgeführt", false);
+		dashboard.showLoader(true);
+		dashboard.setMenuTransparent(false);
 
 		User user = Settings.getInstance().getUser();
 		if (savePwd.isSelected()) {
@@ -50,7 +57,7 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				new IliasStarter(dashboard, username, password).login();
+				starter.login(username, password);
 			}
 		}).start();
 	}
@@ -59,11 +66,9 @@ public class LoginProvider implements EventHandler<ActionEvent> {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				dashboard.setStatusText(message, true);
+				Dashboard.setStatusText(message, true);
 				usernameField.requestFocus();
 				usernameField.selectAll();
-				dashboard.fadeInLogin();
-				dashboard.showLoader(false);
 			}
 		});
 	}

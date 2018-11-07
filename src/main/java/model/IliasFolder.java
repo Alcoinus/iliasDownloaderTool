@@ -6,6 +6,7 @@ import java.util.List;
 import control.LocalFileStorage;
 import javafx.scene.image.ImageView;
 
+@SuppressWarnings("restriction")
 public class IliasFolder extends IliasTreeNode {
 	private static final long serialVersionUID = 6134132849917192741L;
 	private final List<IliasTreeNode> childFolders;

@@ -17,8 +17,6 @@ public class DesktopHelper {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-			// showErrorMessage();
 		}
 	}
 
@@ -32,8 +30,6 @@ public class DesktopHelper {
 					e.printStackTrace();
 				}
 			}
-		} else {
-			// showErrorMessage();
 		}
 	}
 
@@ -47,8 +43,6 @@ public class DesktopHelper {
 					e.printStackTrace();
 				}
 			}
-		} else {
-			// showErrorMessage();
 		}
 	}
 

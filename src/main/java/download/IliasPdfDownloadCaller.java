@@ -3,6 +3,7 @@ package download;
 import java.io.File;
 import java.util.List;
 
+import control.LocalFileStorage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
@@ -11,7 +12,6 @@ import model.IliasFile;
 import model.IliasTreeNode;
 import model.persistance.IliasTreeProvider;
 import utils.DirectoryUtils;
-import control.LocalFileStorage;
 
 /**
  * This class provides the option to ask the User for a position to store the
@@ -20,6 +20,7 @@ import control.LocalFileStorage;
  * @author deoldsax
  *
  */
+@SuppressWarnings("restriction")
 public class IliasPdfDownloadCaller extends Task<Void> {
 	private IliasTreeNode node;
 	private DownloadMode mode;
@@ -75,8 +76,8 @@ public class IliasPdfDownloadCaller extends Task<Void> {
 				String path = targetPath;
 				if (selectedFile != null) {
 					path = selectedFile.getAbsolutePath();
-					if (!path.endsWith("." + file.getExtension())) {
-						path = path + "." + file.getExtension();
+					if (!path.toLowerCase().endsWith("." + file.getExtension().toLowerCase())) {
+						path = path + "." + file.getExtension().toLowerCase();
 					}
 					new Thread(new IliasFileDownloaderTask(file, path)).start();
 				}

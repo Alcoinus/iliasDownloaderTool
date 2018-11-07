@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javafx.scene.image.ImageView;
 
+@SuppressWarnings("restriction")
 public abstract class IliasTreeNode implements Serializable {
 	private static final long serialVersionUID = -5666402232004312659L;
 	private final String url;
