@@ -2,9 +2,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>deoldsax</groupId>
+	<groupId>alcoinus</groupId>
 	<artifactId>Ilias</artifactId>
-	<version>v1.1.1</version>
+	<version>v1.2.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -14,7 +14,7 @@
 	</properties>
 
 	<organization>
-		<name>DeOldSax</name>
+		<name>Alcoinus</name>
 	</organization>
 
 	<dependencies>
