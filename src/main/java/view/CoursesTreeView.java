@@ -209,8 +209,6 @@ public class CoursesTreeView extends TreeView<IliasTreeNode> {
 		private BorderPane buildCell() {
 			final BorderPane pane = new BorderPane();
 
-			pane.setPrefWidth(this.getWidth());
-
 			box = new Label();
 			box.setAlignment(Pos.TOP_LEFT);
 

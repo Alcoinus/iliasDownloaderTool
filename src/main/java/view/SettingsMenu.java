@@ -310,6 +310,7 @@ public class SettingsMenu extends PopOver/* implements EventHandler<ActionEvent>
 				flags.setConnectSecure(true);
 				button.setId("autoButtonActive");
 			}
+			return;
 		}
 	}
 }
